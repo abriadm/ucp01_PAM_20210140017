@@ -36,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -76,7 +77,7 @@ fun TampilLayout(
             modifier = Modifier.padding(20.dp)
         ){
             Row {
-                Text(text = "Register", modifier = Modifier, fontSize = 25.sp, fontStyle = FontStyle.Normal)
+                Text(text = "Register", modifier = Modifier, fontSize = 25.sp, fontStyle = FontStyle.Normal, fontWeight = FontWeight.Bold)
             }
             TampilForm()
         }
@@ -94,6 +95,9 @@ fun TampilForm(cobaViewModel: CobaViewModel = viewModel()) {
         mutableStateOf("")
     }
     var almt by remember {
+        mutableStateOf("")
+    }
+    var email by remember {
         mutableStateOf("")
     }
 
@@ -117,6 +121,17 @@ fun TampilForm(cobaViewModel: CobaViewModel = viewModel()) {
         label = { Text(text = "Telepon") },
         onValueChange = { textTlp = it }
     )
+    OutlinedTextField(value = email,
+        singleLine = true,
+        shape = MaterialTheme.shapes.large,
+        modifier = Modifier.fillMaxWidth(),
+        label = { Text(text = "Email") },
+        onValueChange = { email = it }
+    )
+    Text(text = "jenis kelamin:", modifier = Modifier)
+    SelectJK(option = jenis.map { id -> context.resources.getString(id) },
+        onSelectionChanged = { cobaViewModel.setJenisK(it) }
+    )
     OutlinedTextField(value = almt,
         singleLine = true,
         shape = MaterialTheme.shapes.large,
@@ -124,22 +139,20 @@ fun TampilForm(cobaViewModel: CobaViewModel = viewModel()) {
         label = { Text(text = "Alamat") },
         onValueChange = { almt = it }
     )
-    SelectJK(option = jenis.map { id -> context.resources.getString(id) },
-        onSelectionChanged = { cobaViewModel.setJenisK(it) }
-    )
     Button(modifier = Modifier.fillMaxWidth(),
-        onClick = { cobaViewModel.insertData(textNama, textTlp, dataform.sex, almt) }) {
+        onClick = { cobaViewModel.insertData(textNama, textTlp, dataform.sex, almt, email) }) {
         Text(
             text = stringResource(id = R.string.submit),
             fontSize = 16.sp
         )
     }
-    Spacer(modifier = Modifier.height(100.dp))
+    Spacer(modifier = Modifier.height(25.dp))
     TampilHasil(
         namanya = cobaViewModel.namaUsr,
         telponnya = cobaViewModel.noTlp,
         jenisnya = cobaViewModel.jenisKl,
-        alamatnya = cobaViewModel.alamat
+        alamatnya = cobaViewModel.alamat,
+        emailnya = cobaViewModel.email
     )
 }
 
@@ -152,7 +165,7 @@ fun SelectJK(
     var selectedValue by rememberSaveable {
         mutableStateOf("")
     }
-    Column(modifier = Modifier.padding(16.dp)) {
+    Row(modifier = Modifier.padding(16.dp)) {
         option.forEach { item ->
             Row(
                 modifier = Modifier.selectable(
@@ -177,9 +190,9 @@ fun SelectJK(
 
     }
 }
-
+// tambah email
 @Composable
-fun TampilHasil(namanya: String, telponnya: String, jenisnya: String, alamatnya:String) {
+fun TampilHasil(namanya: String, telponnya: String, jenisnya: String, alamatnya:String, emailnya:String) {
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
@@ -200,6 +213,10 @@ fun TampilHasil(namanya: String, telponnya: String, jenisnya: String, alamatnya:
         )
         Text(
             text = "Alamat : " + alamatnya,
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
+        )
+        Text(
+            text = "Email : " + emailnya,
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
         )
     }
